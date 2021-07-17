@@ -6,7 +6,8 @@ import { GetStaticProps } from 'next'
 import {GithubIcon,TwitterIcon,EmailIcon,ProfileIcon} from "../components/icons"
 export default function Home(props) {
   const { posts, hasArchive } = props
-
+  const names = posts.data.map(post => post.title)
+  console.log(names)
   return (
     <Layout title="">
       <div>
@@ -37,23 +38,18 @@ export default function Home(props) {
       <div>
       <div className="border-blue-400 border-2 w-16 mr-auto ml-auto  mt-7"></div>
       </div>
-      {posts.map((post) => <div
-        key={post.slug}
+      {posts.data.map((post) => <div
+        key={post.id}
         className="h-auto"
       >
         <div className="md:w-4/12 text-center md:h-96 h-80 border-light-blue-500 mx-auto border-4 mt-20 w-9/12  rounded-lg  border-opacity-75 shadow-xl">
-        <Link href="/posts/[id]" as={`/posts/${post.slug}`}><a>
-        <img src={post.images} className="w-9/12  md:h-60 mt-3 h-44 mx-auto" alt="image" />
+        <Link href="/posts/[id]" as={`/posts/${post.id}`}><a>
+        <img src={post.thumbnail_image} className="w-9/12  md:h-60 mt-3 h-44 mx-auto" alt="image" />
         <div className="text-3xl mt-6">{post.title}</div>
-        <div className="mt-2"><span>{post.published}</span></div>
+        <div className="mt-2"><span>{post.created_at}</span></div>
         </a></Link>
         </div>
       </div>)}
-      {hasArchive ? (
-        <div className="home-archive text-red-200">
-          <Link href="/archive/[page]" as="/archive/1"><a>アーカイブ</a></Link>
-        </div>
-      ) : ``}
       </div>
     </Layout>
   )
@@ -61,15 +57,16 @@ export default function Home(props) {
 /**
  * ページコンポーネントで使用する値を用意する
  */
-export const getStaticProps: GetStaticProps = async({ params })  => {
-  const MAX_COUNT = 5
-  const posts = await readContentFiles({ fs })
-  const hasArchive = posts.length > MAX_COUNT
-  console.log(posts);
-  return {
-    props: {
-      posts: posts.slice(0, MAX_COUNT),
-      hasArchive,
+ export async function getStaticProps(context) {
+  const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts`)
+  const data = await res.json()
+  const posts = JSON.parse(JSON.stringify(data));
+  if (!data) {
+    return {
+      notFound: true,
     }
+  }
+  return {
+    props: { posts }, // will be passed to the page component as props
   }
 }

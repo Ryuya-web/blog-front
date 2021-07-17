@@ -1,4 +1,3 @@
-import fs from "fs"
 import path from "path"
 import Layout from "../../components/Layout"
 import { listContentFiles, readContentFile } from "../../lib/content-loader"
@@ -29,21 +28,28 @@ export default function Post(post) {
 /**
  * 有効な URL パラメータを全件返す
  */
-export async function getStaticPaths() {
-  const paths = listContentFiles({ fs })
-    .map((filename) => ({
-      params: {
-        slug: path.parse(filename).name,
-      }
-    }))
+ export const getStaticPaths = async () => {
+  // 外部APIエンドポイントを呼び出しデータ取得
+  const res = await fetch("https://koddaku-backend.herokuapp.com/api_posts/")
+  const posts = await res.json()  
+  const blogs = posts.data
+
+  // 事前ビルドしたいパスを指定
+  const paths = blogs.map((blog) => ({
+    params: {
+      // ファイル名と合わせる ※文字列指定
+      id: blog.id.toString(),
+    },
+  }))
+  // paths：事前ビルドするパス対象を指定するパラメータ
+  // fallback：事前ビルドしたパス以外にアクセスしたときのパラメータ true:カスタム404Pageを表示 false:404pageを表示
   return { paths, fallback: false }
 }
 
-export async function getStaticProps(context) {
-  const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts/5`)
+export async function getStaticProps({ params }) {
+  const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts/${params.id}`)
   const data = await res.json()
   const post = JSON.parse(JSON.stringify(data));
-  console.log(post.data.title);
   if (!data) {
     return {
       notFound: true,
