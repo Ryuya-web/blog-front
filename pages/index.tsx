@@ -1,13 +1,11 @@
 import fs from "fs"
 import Link from "next/link"
 import Layout from "../components/Layout"
-import { readContentFiles } from "../lib/content-loader"
 import { GetStaticProps } from 'next'
 import {GithubIcon,TwitterIcon,EmailIcon,ProfileIcon} from "../components/icons"
 export default function Home(props) {
-  const { posts, hasArchive } = props
+  const { posts } = props
   const names = posts.data.map(post => post.title)
-  console.log(names)
   return (
     <Layout title="">
       <div>

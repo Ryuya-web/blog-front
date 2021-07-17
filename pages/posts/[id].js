@@ -1,6 +1,7 @@
 import path from "path"
 import Layout from "../../components/Layout"
-import { listContentFiles, readContentFile } from "../../lib/content-loader"
+import remark from 'remark'
+import html from 'remark-html'
 export default function Post(post) {
   const blog = post.post.data
   return (
@@ -14,7 +15,7 @@ export default function Post(post) {
       </div>
       <div className="border-blue-300 border-2 mr-auto ml-auto  mt-2"></div>
       <div className="post-body mt-10 text-xl"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
+        dangerouslySetInnerHTML={{ __html: post.content }}
       />
       </div>
       <div>
@@ -22,9 +23,12 @@ export default function Post(post) {
     </Layout>
   )
 }
-/**
- * ページコンポーネントで使用する値を用意する
- */
+
+const markdownToHtml = async (markdown) => {
+  const result = await remark().use(html).process(markdown)
+  return result.toString()
+}
+
 /**
  * 有効な URL パラメータを全件返す
  */
@@ -50,6 +54,7 @@ export async function getStaticProps({ params }) {
   const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts/${params.id}`)
   const data = await res.json()
   const post = JSON.parse(JSON.stringify(data));
+  const content = await markdownToHtml((post.data.content) || '')
   if (!data) {
     return {
       notFound: true,
@@ -57,6 +62,6 @@ export async function getStaticProps({ params }) {
   }
 
   return {
-    props: { post }, // will be passed to the page component as props
+    props: { post,content }, // will be passed to the page component as props
   }
 }
