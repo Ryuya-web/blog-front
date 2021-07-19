@@ -5,7 +5,8 @@ import { GetStaticProps } from 'next'
 import {GithubIcon,TwitterIcon,EmailIcon,ProfileIcon} from "../components/icons"
 export default function Home(props) {
   const { posts } = props
-  const names = posts.data.map(post => post.title)
+  const names = posts.map(post => post.thumbnail_image)
+  console.log(posts);
   return (
     <Layout title="">
       <div>
@@ -36,15 +37,15 @@ export default function Home(props) {
       <div>
       <div className="border-blue-400 border-2 w-16 mr-auto ml-auto  mt-7"></div>
       </div>
-      {posts.data.map((post) => <div
+      {posts.map((post) => <div
         key={post.id}
         className="h-auto"
       >
         <div className="md:w-4/12 text-center md:h-96 h-80 border-light-blue-500 mx-auto border-4 mt-20 w-9/12  rounded-lg  border-opacity-75 shadow-xl">
         <Link href="/posts/[id]" as={`/posts/${post.id}`}><a>
-        <img src={post.thumbnail_image} className="w-9/12  md:h-60 mt-3 h-44 mx-auto" alt="image" />
+        <img src={post.thumbnail_image_url} className="w-9/12  md:h-60 mt-3 h-44 mx-auto" alt="image" />
         <div className="text-3xl mt-6">{post.title}</div>
-        <div className="mt-2"><span>{post.created_at}</span></div>
+        <div className="mt-2"><span>{post.created_at_to_jp}</span></div>
         </a></Link>
         </div>
       </div>)}
