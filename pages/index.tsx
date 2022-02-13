@@ -1,6 +1,7 @@
 import fs from "fs"
 import Link from "next/link"
 import Layout from "../components/Layout"
+import axios from "axios";
 import { GetStaticProps } from 'next'
 import {GithubIcon,TwitterIcon,EmailIcon,ProfileIcon} from "../components/icons"
 export default function Home(props) {
@@ -57,8 +58,8 @@ export default function Home(props) {
  * ページコンポーネントで使用する値を用意する
  */
  export async function getStaticProps(context) {
-  const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts`)
-  const data = await res.json()
+  const res = await axios.get(`https://koddaku-backend.herokuapp.com/api_posts`)
+  const data = res.data
   const posts = JSON.parse(JSON.stringify(data));
   if (!data) {
     return {

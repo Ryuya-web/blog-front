@@ -1,5 +1,6 @@
 import path from "path"
 import Layout from "../../components/Layout"
+import axios from "axios";
 import remark from 'remark'
 import html from 'remark-html'
 export default function Post(post) {
@@ -35,8 +36,8 @@ const markdownToHtml = async (markdown) => {
  */
  export const getStaticPaths = async () => {
   // 外部APIエンドポイントを呼び出しデータ取得
-  const res = await fetch("https://koddaku-backend.herokuapp.com/api_posts/")
-  const posts = await res.json()  
+  const res = await axios.get("https://koddaku-backend.herokuapp.com/api_posts/")
+  const posts = await res.data
   const blogs = posts
 
   // 事前ビルドしたいパスを指定
@@ -52,8 +53,8 @@ const markdownToHtml = async (markdown) => {
 }
 
 export async function getStaticProps({ params }) {
-  const res = await fetch(`https://koddaku-backend.herokuapp.com/api_posts/${params.id}`)
-  const data = await res.json()
+  const res = await axios(`https://koddaku-backend.herokuapp.com/api_posts/${params.id}`)
+  const data = await res.data
   const post = JSON.parse(JSON.stringify(data));
   const content = await markdownToHtml((post.content) || '')
   if (!data) {
